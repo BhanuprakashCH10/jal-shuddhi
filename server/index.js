@@ -3,33 +3,55 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth');
-const reportRoutes = require('./routes/reports');
-
 const app = express();
-const PORT = process.env.PORT || 5000;
-
 
 // Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cors({
+    origin: ["https://jal-shuddhi.vercel.app", "http://localhost:5173"], // Allow your frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+app.use(express.json({ limit: '50mb' }));
 
-// routes
-app.use('/api/auth', authRoutes);
-app.use('/api/reports', reportRoutes);
+// --- KEY FIX: Database Connection Function ---
+let isConnected = false; // Track connection status
 
-// 1. Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected Successfully"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+const connectDB = async () => {
+    if (isConnected) return; // If already connected, skip
+    
+    try {
+        const db = await mongoose.connect(process.env.MONGO_URI, {
+            dbName: "jalshuddhi" // Explicitly specify DB name
+        });
+        isConnected = db.connections[0].readyState;
+        console.log("MongoDB Connected Successfully");
+    } catch (error) {
+        console.error("MongoDB Connection Failed:", error);
+        throw error; // Stop the server if DB fails
+    }
+};
 
-// Basic Route
+// Routes
 app.get('/', (req, res) => {
-  res.send('Jal Shuddhi Backend is Running!');
+    res.send("Jal Shuddhi Backend is Running!");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
-});
+app.use('/api/auth', async (req, res, next) => {
+    await connectDB(); // Wait for DB before handling auth
+    next();
+}, require('./routes/auth'));
+
+app.use('/api/reports', async (req, res, next) => {
+    await connectDB(); // Wait for DB before handling reports
+    next();
+}, require('./routes/reports'));
+
+// Export for Vercel
+module.exports = app;
+
+// Local Development
+if (require.main === module) {
+    connectDB().then(() => {
+        app.listen(5000, () => console.log("Server running on port 5000"));
+    });
+}
