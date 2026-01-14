@@ -27,7 +27,7 @@ const Register = () => {
     try {
       // 2. Send Data to Backend
       // We only send name, email, and password (confirmPassword is just for frontend check)
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post('https://jal-shuddhi.onrender.com/api/auth/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password

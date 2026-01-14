@@ -81,7 +81,7 @@ const ReportWaste = () => {
         imageUrl: base64Image // Send the actual image string
       };
 
-      await axios.post('http://localhost:5000/api/reports', payload);
+      await axios.post('https://jal-shuddhi.onrender.com/api/reports', payload);
 
       alert("Report Submitted Successfully!");
       navigate('/dashboard'); // Go to dashboard to see the image
