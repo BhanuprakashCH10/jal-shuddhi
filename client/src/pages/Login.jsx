@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // 1. Send Login Request
-      const response = await axios.post('https://jal-shuddhi.onrender.com/api/auth/login', formData);
+      const response = await axios.post('https://jal-shuddhi-api.vercel.app/api/auth/login', formData);
 
       // 2. Save Token to LocalStorage (Browser Memory)
       localStorage.setItem('token', response.data.token);

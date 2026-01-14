@@ -11,7 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get('https://jal-shuddhi.onrender.com/api/reports');
+        const response = await axios.get('https://jal-shuddhi-api.vercel.app/api/reports');
         setReports(response.data);
         setLoading(false);
       } catch (error) {
@@ -31,7 +31,7 @@ const Dashboard = () => {
     }
 
     try {
-      await axios.put(`https://jal-shuddhi.onrender.com/api/reports/${id}/status`, { status: 'Cleaned' });
+      await axios.put(`https://jal-shuddhi-api.vercel.app/api/reports/${id}/status`, { status: 'Cleaned' });
       setReports(reports.map(report => report._id === id ? { ...report, status: 'Cleaned' } : report));
     } catch (error) {
       console.error("Error updating status:", error);
